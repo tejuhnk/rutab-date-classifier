@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Rutab · Date variety classifier</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#0f0914;--side:#0b0610;--card:#181020;--card2:#21172b;--line:rgba(255,255,255,.08);--ink:#f3ebf5;--mute:#a595b1;--a:244,178,76;--r:255,107,135;--amber:rgb(var(--a));--rose:rgb(var(--r));color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f4eef6;--side:#fff;--card:#fff;--card2:#f3ecf6;--line:rgba(40,20,50,.1);--ink:#251b2c;--mute:#6b5a77;--a:190,108,4;--r:214,51,90;color-scheme:light}}
+:root[data-theme="dark"]{--bg:#0f0914;--side:#0b0610;--card:#181020;--card2:#21172b;--line:rgba(255,255,255,.08);--ink:#f3ebf5;--mute:#a595b1;--a:244,178,76;--r:255,107,135}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 'Bricolage Grotesque',system-ui,sans-serif}
+.num{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.app{display:grid;grid-template-columns:236px 1fr;min-height:100%}
+.side{background:var(--side);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.02em;padding:0 8px 22px}
+.nav{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;color:var(--mute);font:inherit;font-weight:600;padding:10px;border-radius:10px;cursor:pointer}
+.nav svg{width:18px;height:18px;flex:none}.nav:hover{color:var(--ink);background:var(--card)}.nav[aria-current=page]{color:var(--ink);background:var(--card2);box-shadow:inset 2px 0 0 var(--amber)}
+.mc{margin-top:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:13px;color:var(--mute)}
+.mc b{display:block;color:var(--ink);font-weight:600;font-size:14px}.mc .num{color:var(--amber);font-size:22px;display:block;margin-top:6px}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--amber);margin-right:8px;box-shadow:0 0 0 3px rgba(var(--a),.2)}
+.wrap{padding:0 32px 48px;min-width:0}
+.bar{display:flex;align-items:center;justify-content:space-between;height:68px;border-bottom:1px solid var(--line);margin-bottom:28px}
+.bar h1{font-size:22px;margin:0;letter-spacing:-.02em;font-weight:800}
+.chip{font-size:12.5px;color:var(--mute);background:var(--card);border:1px solid var(--line);border-radius:99px;padding:5px 12px}
+.view{display:none}.view.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;min-width:0}
+.card h2{font-size:16px;margin:0 0 2px;font-weight:600}.sub{color:var(--mute);font-size:13.5px;margin:0 0 18px}
+.g2{display:grid;grid-template-columns:320px 1fr;gap:18px;align-items:start}.stack{display:grid;gap:18px;min-width:0}
+.sl{margin:0 0 15px}.sl div{display:flex;justify-content:space-between;font-size:13.5px}.sl .num{color:var(--amber);font-size:12.5px}
+input[type=range]{width:100%;accent-color:rgb(var(--a));margin:5px 0 0}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+button,.btn{font:inherit;font-size:13.5px;font-weight:600;color:var(--ink);background:var(--card2);border:1px solid var(--line);border-radius:9px;padding:8px 13px;cursor:pointer}
+button:hover{border-color:rgba(var(--a),.6)}button.pri{background:var(--amber);color:#1a1020;border-color:transparent}button[aria-pressed=true]{background:rgba(var(--a),.18);border-color:rgba(var(--a),.6)}
+.smp{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}.smp button{padding:5px 10px;font-weight:500;font-size:12.5px}
+.fine{font-size:12.5px;color:var(--mute);margin:0}
+.res{display:grid;grid-template-columns:128px 1fr 1fr;gap:22px;align-items:center}
+.res svg{width:128px;height:auto;background:radial-gradient(circle at 50% 55%,rgba(var(--a),.12),transparent 70%);border-radius:14px}
+.name{font-size:clamp(34px,4vw,50px);font-weight:800;letter-spacing:-.035em;line-height:1}
+.conf{margin:8px 0 14px;color:var(--mute)}.conf b{color:var(--amber);font-weight:500;font-size:20px}
+.t3 div{display:grid;grid-template-columns:70px 1fr 40px;gap:10px;align-items:center;font-size:13.5px;margin:7px 0}.t3 i{display:block;height:6px;border-radius:3px;background:var(--card2)}.t3 i u{display:block;height:100%;border-radius:3px;background:var(--amber);text-decoration:none;transition:width .25s}
+.t3 .num{text-align:right;color:var(--mute);font-size:12.5px}
+.cvw{position:relative;height:340px;margin-top:6px}canvas{position:absolute;inset:0;width:100%;height:100%}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line)}th{font-weight:600;color:var(--mute);font-size:13px}td.num,th.r{text-align:right}tr:last-child td{border:0}
+.sw{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;vertical-align:-1px}
+.empty{color:var(--mute);padding:18px 0 4px;font-size:14px}
+.drop{display:block;border:1.5px dashed rgba(var(--a),.5);border-radius:16px;padding:44px 20px;text-align:center;color:var(--mute);cursor:pointer;background:rgba(var(--a),.04)}
+.drop b{display:block;color:var(--ink);font-size:18px;margin-bottom:4px}.drop.hot{background:rgba(var(--a),.12)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.err{color:var(--rose);margin:14px 0 0;font-size:14px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.tile .num{font-size:30px;font-weight:500;letter-spacing:-.03em;display:block}.tile span{font-size:13px;color:var(--mute)}.tile.hi .num{color:var(--amber)}
+.mg{display:grid;grid-template-columns:1.6fr 1fr;gap:18px}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.lg{margin-left:auto;font-size:13px;color:var(--mute)}.lg s{display:inline-block;width:16px;height:3px;vertical-align:middle;margin:0 6px 0 12px;text-decoration:none}
+svg#ch{width:100%;height:auto;display:block}.rd{display:flex;gap:22px;flex-wrap:wrap;font-size:13px;color:var(--mute);margin-top:8px}.rd b{color:var(--ink);font-weight:500}
+.cb{display:grid;grid-template-columns:70px 1fr 36px;gap:10px;align-items:center;font-size:13.5px;margin:10px 0}.cb i{display:block;height:8px;border-radius:4px;background:rgba(var(--a),.85)}.cb .num{text-align:right;color:var(--mute);font-size:12.5px}
+.note{margin-top:16px;padding:12px 14px;border-radius:10px;background:rgba(var(--a),.08);font-size:13.5px}
+#toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--card2);color:var(--ink);border:1px solid rgba(var(--a),.6);border-radius:99px;padding:10px 18px;font-size:14px;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:20}#toast.on{opacity:1;transform:translate(-50%,0)}
+@keyframes fl{from{background:rgba(var(--a),.28)}to{background:transparent}}tr.flash td{animation:fl 1.6s ease-out}#bo{scroll-margin-top:16px}
+@media(max-width:940px){#toast{bottom:92px}.app{grid-template-columns:1fr}.side{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;flex-direction:row;z-index:5;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));justify-content:space-around}
+.brand,.mc{display:none}.nav{flex-direction:column;gap:2px;font-size:11.5px;padding:6px 10px;text-align:center;width:auto}.nav[aria-current=page]{box-shadow:none}.wrap{padding:0 16px 96px}
+.g2,.mg{grid-template-columns:1fr}.res{grid-template-columns:100px 1fr}.res>:last-child{grid-column:1/-1}.res svg{width:100px}.tiles{grid-template-columns:1fr 1fr}.chip{display:none}}
+</style></head><body><div class="app">
+<nav class="side" aria-label="Main"><div class="brand"><svg width="28" height="28" viewBox="0 0 28 28"><g stroke="rgb(var(--a))" stroke-width="1.3" opacity=".6"><path d="M5 8l9 6M5 14l9 0M5 20l9-6M14 14l9-5M14 14l9 5"/></g><g fill="rgb(var(--a))"><circle cx="5" cy="8" r="2.4"/><circle cx="5" cy="14" r="2.4"/><circle cx="5" cy="20" r="2.4"/><circle cx="14" cy="14" r="3"/><circle cx="23" cy="9" r="2.4"/><circle cx="23" cy="19" r="2.4"/></g></svg>Rutab</div>
+<button class="nav" data-v="classify"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5"/></svg>Classify</button>
+<button class="nav" data-v="batch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Batch</button>
+<button class="nav" data-v="model"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5"/></svg>Model</button>
+<div class="mc"><b>rutab-mlp</b>34 · 16 · 16 · 7<span class="num">93.3%</span>test accuracy</div></nav>
+<div class="wrap"><header class="bar"><h1 id="ttl">Classify</h1><span class="chip"><i class="dot"></i>Sandbox · simulated inference</span></header>
+
+<section class="view" id="classify"><div class="g2">
+<div class="card"><h2>Specimen</h2><p class="sub">Measurements from one fruit. Results update as you adjust.</p>
+<div class="smp" id="smp" role="group" aria-label="Load a sample"></div><div id="sl"></div><p class="fine">8 of the model’s 34 inputs are shown. The rest are derived in this sandbox.</p></div>
+<div class="stack"><div class="card"><div class="res"><svg id="sp" viewBox="0 0 120 160" aria-hidden="true"><defs><radialGradient id="gd" cx=".35" cy=".3" r=".85"><stop id="g0" offset="0"/><stop id="g1" offset="1"/></radialGradient></defs><g transform="rotate(-18 60 80)"><ellipse id="el" cx="60" cy="80" fill="url(#gd)"/><ellipse id="hl" fill="#fff" opacity=".2"/><ellipse id="cp" cx="60" fill="#1b0e0a" opacity=".6" rx="6" ry="3"/></g></svg>
+<div aria-live="polite"><div class="name" id="pn">–</div><div class="conf"><b id="pc" class="num"></b> confidence</div><button class="pri" id="save">Save result</button></div><div class="t3" id="t3"></div></div></div>
+<div class="card" id="hc"><div class="tools" style="margin:0 0 12px"><h2 style="margin:0">Saved results <span class="num" id="hn" style="color:var(--mute);font-size:13px;font-weight:400"></span></h2><button id="clr" style="margin-left:auto" hidden>Clear</button></div><div id="hist"></div></div>
+<div class="card"><h2>Inference trace</h2><p class="sub">Activations from input to softmax for this specimen.</p><div class="cvw"><canvas id="cv"></canvas></div></div></div></div></section>
+
+<section class="view" id="batch"><div class="card"><h2>Classify a file</h2><p class="sub">Drop a CSV with the dataset’s column names (AREA, PERIMETER, MAJOR_AXIS, MINOR_AXIS, ECCENTRICITY, SOLIDITY, EXTENT, ASPECT_RATIO).</p>
+<label class="drop" id="dz"><b>Drop a CSV here, or choose a file</b>Processed in your browser. Nothing is uploaded.<input type="file" id="fi" accept=".csv" hidden></label>
+<div style="margin-top:12px"><button id="demo">Use sample data</button></div><div class="err" id="er" role="alert"></div><div id="bo"></div></div></section>
+
+<section class="view" id="model"><div class="tiles"><div class="card tile hi"><span class="num">93.3%</span><span>Test accuracy · 180 fruits</span></div><div class="card tile"><span class="num">98.9%</span><span>Final training accuracy</span></div><div class="card tile"><span class="num">91.0%</span><span>Final validation accuracy</span></div><div class="card tile"><span class="num">951</span><span>Trainable parameters</span></div></div>
+<div class="mg"><div class="card"><h2>Training history</h2><div class="tools"><button id="mA" aria-pressed="true">Accuracy</button><button id="mL" aria-pressed="false">Loss</button><span class="lg"><s style="background:var(--amber)"></s>Training<s style="background:var(--rose)"></s>Validation</span></div>
+<svg id="ch" viewBox="0 0 720 270" role="img" aria-label="Training and validation curves"></svg><input id="ep" type="range" min="1" max="100" value="100" aria-label="Epoch"><div class="rd num" id="rd"></div><div class="note" id="ins"></div></div>
+<div class="stack"><div class="card"><h2>Training data</h2><p class="sub">898 fruits, 7 varieties</p><div id="bars"></div></div>
+<div class="card"><h2>Architecture</h2><table><tr><th>Layer</th><th>Activation</th><th class="r">Params</th></tr><tr><td>Input · 34</td><td>–</td><td class="num">0</td></tr><tr><td>Dense 16</td><td>ReLU</td><td class="num">560</td></tr><tr><td>Dense 16</td><td>ReLU</td><td class="num">272</td></tr><tr><td>Dense 7</td><td>Softmax</td><td class="num">119</td></tr></table><p class="fine" style="margin-top:12px">Adam · categorical cross-entropy · batch 8 · 100 epochs · standardised inputs</p></div></div></div></section>
+</div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+const D=[[0.6132,1.3757,0.6736,1.1056],[0.7003,0.9485,0.7083,0.8652],[0.723,0.7706,0.7361,0.722],[0.7422,0.6577,0.7639,0.6107],[0.7787,0.5684,0.7847,0.534],[0.8118,0.506,0.8333,0.4758],[0.8345,0.4518,0.8125,0.4476],[0.8519,0.4085,0.8333,0.4238],[0.8798,0.3785,0.8403,0.3941],[0.8746,0.3566,0.8403,0.3741],[0.8833,0.3324,0.8472,0.3532],[0.892,0.3146,0.8611,0.336],[0.9007,0.2987,0.8819,0.3211],[0.9024,0.2829,0.8819,0.3092],[0.9024,0.2706,0.875,0.3006],[0.9077,0.2594,0.8819,0.2882],[0.9094,0.2507,0.8819,0.2872],[0.9199,0.2401,0.8819,0.2827],[0.9164,0.2281,0.8819,0.2701],[0.9199,0.2197,0.8889,0.266],[0.9268,0.2111,0.875,0.2697],[0.9251,0.2084,0.8889,0.259],[0.9251,0.195,0.875,0.2624],[0.9321,0.19,0.8958,0.2432],[0.9408,0.1877,0.8958,0.2434],[0.9355,0.1787,0.9097,0.2412],[0.9408,0.1708,0.9028,0.2372],[0.946,0.1694,0.9028,0.2496],[0.9443,0.1626,0.9028,0.2451],[0.9443,0.1581,0.9097,0.2344],[0.9443,0.1541,0.9097,0.2406],[0.9477,0.1487,0.8889,0.2365],[0.9477,0.1476,0.9167,0.2264],[0.9495,0.1416,0.8958,0.2347],[0.9477,0.143,0.9097,0.2351],[0.9564,0.1376,0.9097,0.2315],[0.9425,0.1351,0.9167,0.2218],[0.9547,0.1339,0.9097,0.2295],[0.953,0.1345,0.9167,0.2321],[0.953,0.1255,0.9097,0.2173],[0.9547,0.1217,0.9097,0.2373],[0.9599,0.1204,0.9097,0.2152],[0.9547,0.1185,0.9097,0.2358],[0.9547,0.1142,0.9167,0.2252],[0.9634,0.1132,0.9097,0.2216],[0.9617,0.1098,0.9097,0.2512],[0.9564,0.108,0.9097,0.2266],[0.9617,0.1041,0.9097,0.2424],[0.9617,0.1045,0.9097,0.2237],[0.9652,0.0999,0.9097,0.2386],[0.9669,0.0971,0.9097,0.2481],[0.9669,0.0965,0.9097,0.2377],[0.9686,0.0952,0.9167,0.2366],[0.9669,0.0921,0.9167,0.2378],[0.9704,0.0896,0.9097,0.2458],[0.9704,0.0875,0.9097,0.2235],[0.9669,0.0866,0.9097,0.2471],[0.9739,0.0848,0.9097,0.2521],[0.9721,0.0825,0.9167,0.2607],[0.9721,0.0816,0.9167,0.2589],[0.9704,0.0811,0.9167,0.2582],[0.9704,0.0783,0.9097,0.2482],[0.9721,0.0754,0.9097,0.2479],[0.9756,0.0743,0.9097,0.2633],[0.9808,0.0713,0.9167,0.2542],[0.9774,0.073,0.9167,0.243],[0.9791,0.072,0.9097,0.2448],[0.9774,0.0699,0.9097,0.2662],[0.9756,0.0681,0.9097,0.2582],[0.9791,0.0653,0.9097,0.2708],[0.9808,0.066,0.9167,0.2559],[0.9843,0.0617,0.9097,0.2604],[0.9791,0.0623,0.9167,0.2699],[0.9826,0.0595,0.9167,0.2746],[0.9826,0.0595,0.9167,0.2735],[0.9826,0.0568,0.9167,0.2776],[0.9791,0.06,0.9167,0.2612],[0.9843,0.0554,0.9167,0.2652],[0.9843,0.0552,0.9097,0.2789],[0.9826,0.0516,0.9167,0.2774],[0.9826,0.0513,0.9167,0.2826],[0.9861,0.0505,0.9097,0.3009],[0.9861,0.0505,0.9167,0.2672],[0.9878,0.0471,0.9167,0.2803],[0.9895,0.0466,0.9097,0.2774],[0.9861,0.0482,0.9167,0.2863],[0.9895,0.0463,0.9167,0.2796],[0.9878,0.0454,0.9097,0.2844],[0.9861,0.043,0.9097,0.2863],[0.9878,0.0419,0.9097,0.2774],[0.9861,0.041,0.9167,0.2899],[0.9895,0.0399,0.9097,0.2865],[0.9913,0.0382,0.9097,0.2911],[0.9878,0.0364,0.9167,0.3121],[0.9895,0.0386,0.9167,0.302],[0.9895,0.0367,0.9097,0.2846],[0.9861,0.0377,0.9167,0.2965],[0.9878,0.0363,0.9167,0.3073],[0.9895,0.0347,0.9167,0.3157],[0.9895,0.0335,0.9097,0.3063]],C=['BERHI','DEGLET','DOKOL','IRAQI','ROTANA','SAFAVI','SOGAY'],N=[65,98,204,72,166,199,94];
+const K=[['#f0b94a','#a8701a'],['#d98a45','#8a4a1c'],['#a8643a','#5a2e18'],['#8d5a3c','#4a2a1a'],['#8a4630','#3f1d14'],['#6e3a2c','#2d1510'],['#c9803a','#7a4318']];
+const cap=s=>s[0]+s.slice(1).toLowerCase(),$=id=>document.getElementById(id);
+const F=[['Area','px²',15e4,65e4,'AREA'],['Perimeter','px',1500,3000,'PERIMETER'],['Major axis','px',600,1100,'MAJOR_AXIS'],['Minor axis','px',350,800,'MINOR_AXIS'],['Eccentricity','',.4,.9,'ECCENTRICITY'],['Solidity','',.9,1,'SOLIDITY'],['Extent','',.6,.85,'EXTENT'],['Aspect ratio','',1.1,2,'ASPECT_RATIO']];
+const P=[[.55,.55,.55,.6,.3,.9,.7,.2],[.25,.3,.35,.3,.55,.8,.5,.5],[.45,.5,.6,.4,.65,.7,.6,.6],[.3,.35,.4,.3,.6,.85,.4,.55],[.7,.65,.7,.7,.45,.75,.65,.35],[.5,.6,.5,.55,.4,.6,.55,.3],[.2,.4,.3,.25,.8,.5,.3,.8]];
+let v=P[2].slice(),sel=2,S,hist=[];
+function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const r=rng(7),mat=(a,b)=>Array.from({length:a},()=>Array.from({length:b},()=>(r()-.5)*2));const M=mat(26,8),W1=mat(34,16),W2=mat(16,16);
+// Sandbox scoring. Replace with a call to your trained model (e.g. fetch('/predict')) returning 7 probabilities in class order.
+function probs(q){const e=P.map(p=>Math.exp(-p.reduce((s,x,i)=>s+(x-q[i])**2,0)/.09)),t=e.reduce((a,b)=>a+b);return e.map(z=>z/t)}
+const argmax=o=>o.indexOf(Math.max(...o)),pct=x=>Math.round(x*100);
+function infer(){
+ const x=v.slice();for(let i=0;i<26;i++){let s=0;for(let k=0;k<8;k++)s+=M[i][k]*(v[k]-.5)*4;x.push(1/(1+Math.exp(-s)))}
+ const h1=W1[0].map((_,j)=>Math.max(0,x.reduce((s,xi,i)=>s+W1[i][j]*(xi-.5),0))),m1=Math.max(...h1,1e-6),a1=h1.map(h=>h/m1);
+ const h2=W2[0].map((_,k)=>Math.max(0,a1.reduce((s,a,j)=>s+W2[j][k]*a,0))),m2=Math.max(...h2,1e-6),a2=h2.map(h=>h/m2);
+ const o=probs(v);S={x,a1,a2,o};const t=argmax(o);
+ $('pn').textContent=cap(C[t]);$('pc').textContent=pct(o[t])+'%';
+ $('t3').innerHTML=o.map((p,i)=>[p,i]).sort((a,b)=>b[0]-a[0]).slice(0,3).map(([p,i])=>`<div><span>${cap(C[i])}</span><i><u style="width:${p*100}%"></u></i><span class="num">${pct(p)}%</span></div>`).join('');
+ const rx=16+v[3]*28,ry=38+v[2]*34,s=(id,o)=>Object.entries(o).forEach(([k,z])=>$(id).setAttribute(k,z));
+ s('el',{rx,ry,cy:80});s('hl',{cx:60-rx*.35,cy:80-ry*.45,rx:rx*.18,ry:ry*.3});s('cp',{cy:80-ry+3});$('g0').setAttribute('stop-color',K[t][0]);$('g1').setAttribute('stop-color',K[t][1]);
+}
+const cv=$('cv'),ctx=cv.getContext('2d');
+function draw(p){
+ const dpr=devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;if(!w)return;if(cv.width!==Math.round(w*dpr)){cv.width=w*dpr;cv.height=h*dpr}
+ ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+ const cs=getComputedStyle(document.documentElement),A=cs.getPropertyValue('--a').trim(),R=cs.getPropertyValue('--r').trim(),mute=cs.getPropertyValue('--mute').trim();
+ const n=[34,16,16,7],xs=[16,w*.33,w*.58,w-100],y0=10,span=h-y0-34,L=[S.x,S.a1,S.a2,S.o],lit=l=>Math.min(1,Math.max(0,p*4-l)),Y=(l,i)=>y0+(i+.5)*span/n[l];
+ const E=[(i,j)=>Math.abs(W1[i][j]*(S.x[i]-.5))*.64,(j,k)=>Math.abs(W2[j][k])*S.a1[j]*.5,(k,c)=>S.a2[k]*S.o[c]*2];
+ for(let l=0;l<3;l++){const gl=lit(l+1);if(!gl)continue;for(let i=0;i<n[l];i++)for(let j=0;j<n[l+1];j++){const a=Math.min(.55,E[l](i,j))*gl;if(a<.03)continue;
+  const neg=l==0?W1[i][j]*(S.x[i]-.5)<0:l==1&&W2[i][j]<0;ctx.strokeStyle=`rgba(${neg?R:A},${a})`;ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(xs[l],Y(l,i));ctx.lineTo(xs[l+1],Y(l+1,j));ctx.stroke()}}
+ const t=argmax(S.o);
+ for(let l=0;l<4;l++){const gl=lit(l);for(let i=0;i<n[l];i++){const a=l==0?Math.abs(L[0][i]-.5)*2:L[l][i],rad=l==0?3:l==3?4+a*7:4.5+a*3;
+  ctx.beginPath();ctx.arc(xs[l],Y(l,i),rad,0,7);ctx.fillStyle=`rgba(${A},${.1+.9*a*gl})`;ctx.fill();ctx.strokeStyle=`rgba(${A},${.3+.5*gl})`;ctx.lineWidth=l==3&&i==t&&gl>.9?2:1;ctx.stroke()}}
+ ctx.font="12.5px 'Bricolage Grotesque',sans-serif";ctx.textBaseline='middle';ctx.textAlign='left';
+ for(let i=0;i<7;i++){ctx.fillStyle=i==t&&lit(3)>.9?`rgb(${A})`:mute;ctx.fillText(cap(C[i])+'  '+pct(S.o[i]*lit(3))+'%',xs[3]+16,Y(3,i))}
+ ctx.fillStyle=mute;ctx.textAlign='center';ctx.textBaseline='alphabetic';[['Input 34',xs[0]+20],['Dense 16 · ReLU',xs[1]],['Dense 16 · ReLU',xs[2]],['Softmax 7',xs[3]+20]].forEach(q=>ctx.fillText(q[0],q[1],h-8))}
+let raf;function wave(){cancelAnimationFrame(raf);if(matchMedia('(prefers-reduced-motion:reduce)').matches){draw(1);return}const t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/1000);draw(p);if(p<1)raf=requestAnimationFrame(f)})(t0)}
+function upd(){F.forEach((f,i)=>{const x=f[2]+v[i]*(f[3]-f[2]);$('o'+i).textContent=(f[3]>100?Math.round(x).toLocaleString('en-US'):x.toFixed(2))+' '+f[1]});document.querySelectorAll('#smp button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.i==sel))}
+function build(){
+ $('sl').innerHTML=F.map((f,i)=>`<div class="sl"><div><label for="s${i}">${f[0]}</label><span class="num" id="o${i}"></span></div><input id="s${i}" type="range" min="0" max="1000" value="${v[i]*1000}"></div>`).join('');
+ F.forEach((f,i)=>$('s'+i).oninput=e=>{v[i]=e.target.value/1000;sel=-1;upd();infer();draw(1)});
+ $('smp').innerHTML=C.map((c,i)=>`<button aria-pressed="${i==sel}" data-i="${i}">${cap(c)}</button>`).join('');
+ $('smp').onclick=e=>{const i=e.target.dataset.i;if(i==null)return;sel=+i;v=P[i].map(x=>Math.min(1,Math.max(0,x+(Math.random()-.5)*.06)));F.forEach((f,k)=>$('s'+k).value=v[k]*1000);upd();infer();wave()};upd()}
+function rh(f){$('hn').textContent=hist.length?'('+hist.length+')':'';$('clr').hidden=!hist.length;$('hist').innerHTML=hist.length?`<table><tr><th>Time</th><th>Variety</th><th class="r">Confidence</th><th class="r">Area (px²)</th></tr>${hist.map((h,i)=>`<tr${f&&i==0?' class="flash"':''}><td class="num">${h.t}</td><td><span class="sw" style="background:${K[h.c][0]}"></span>${cap(C[h.c])}</td><td class="num r" style="text-align:right">${h.p}%</td><td class="num" style="text-align:right">${h.a}</td></tr>`).join('')}</table>`:'<div class="empty">No saved results yet. Choose Save result to keep this classification here.</div>'}
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),2400)}
+const smooth=()=>matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth';
+$('save').onclick=()=>{const t=argmax(S.o),b=$('save');hist.unshift({c:t,p:pct(S.o[t]),a:Math.round(F[0][2]+v[0]*(F[0][3]-F[0][2])).toLocaleString('en-US'),t:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})});hist=hist.slice(0,6);rh(1);
+ b.textContent='Saved ✓';clearTimeout(b._t);b._t=setTimeout(()=>b.textContent='Save result',1600);toast('Saved: '+cap(C[t])+' · '+pct(S.o[t])+'%');
+ $('hc').scrollIntoView({behavior:smooth(),block:'nearest'})};
+$('clr').onclick=()=>{hist=[];rh();toast('Cleared saved results')};
+// batch
+function runBatch(rows){const res=rows.map(q=>{const o=probs(q.v);return{...q,c:argmax(o),p:pct(Math.max(...o))}}),cnt=C.map((_,i)=>res.filter(x=>x.c==i).length);
+ $('bo').innerHTML=`<div class="chips">${cnt.map((n,i)=>n?`<span class="chip"><span class="sw" style="background:${K[i][0]}"></span>${cap(C[i])} <b class="num">${n}</b></span>`:'').join('')}</div><p class="fine" style="margin-bottom:8px">${res.length} fruits classified${res.length>12?'. Showing the first 12.':'.'}</p>
+ <table><tr><th>#</th><th class="r">Area (px²)</th><th class="r">Major axis</th><th>Variety</th><th class="r">Confidence</th></tr>${res.slice(0,12).map((x,i)=>`<tr><td class="num">${i+1}</td><td class="num" style="text-align:right">${x.a}</td><td class="num" style="text-align:right">${x.m}</td><td><span class="sw" style="background:${K[x.c][0]}"></span>${cap(C[x.c])}</td><td class="num" style="text-align:right">${x.p}%</td></tr>`).join('')}</table>`;toast(res.length+' fruits classified');$('bo').scrollIntoView({behavior:smooth(),block:'start'})}
+const fmt=(q,i)=>({v:q,a:Math.round(F[0][2]+q[0]*(F[0][3]-F[0][2])).toLocaleString('en-US'),m:Math.round(F[2][2]+q[2]*(F[2][3]-F[2][2]))});
+$('demo').onclick=()=>{$('er').textContent='';runBatch(Array.from({length:14},(_,i)=>fmt(P[i%7].map(x=>Math.min(1,Math.max(0,x+(Math.random()-.5)*.1))))))};
+function readFile(f){if(!f)return;f.text().then(t=>{const ln=t.trim().split(/\r?\n/),hd=ln[0].split(',').map(s=>s.trim().toUpperCase()),ix=F.map(f=>hd.indexOf(f[4]));
+ if(ix.includes(-1)){$('bo').innerHTML='';$('er').textContent='This file is missing columns: '+F.filter((f,i)=>ix[i]<0).map(f=>f[4]).join(', ')+'. Add them to the header row and try again.';return}
+ $('er').textContent='';runBatch(ln.slice(1).filter(Boolean).map(l=>{const c=l.split(',');return fmt(F.map((f,i)=>Math.min(1,Math.max(0,(parseFloat(c[ix[i]])-f[2])/(f[3]-f[2])))))}))})}
+$('fi').onchange=e=>readFile(e.target.files[0]);$('dz').ondragover=e=>{e.preventDefault();$('dz').classList.add('hot')};$('dz').ondragleave=()=>$('dz').classList.remove('hot');$('dz').ondrop=e=>{e.preventDefault();$('dz').classList.remove('hot');readFile(e.dataTransfer.files[0])};
+// model
+let m=0;function chart(){const W=720,H=270,pl=44,pr=12,pt=12,pb=26,k=m?[1,3]:[0,2],lo=m?0:.6,hi=m?1.4:1,e=+$('ep').value-1,X=i=>pl+i*(W-pl-pr)/99,Y=z=>pt+(1-(z-lo)/(hi-lo))*(H-pt-pb);
+ let s='';for(let q=0;q<=4;q++){const z=lo+(hi-lo)*q/4;s+=`<line x1="${pl}" x2="${W-pr}" y1="${Y(z)}" y2="${Y(z)}" stroke="var(--line)"/><text x="${pl-8}" y="${Y(z)+4}" text-anchor="end" font-size="11" fill="var(--mute)" font-family="IBM Plex Mono">${z.toFixed(m?1:2)}</text>`}
+ [1,25,50,75,100].forEach(i=>s+=`<text x="${X(i-1)}" y="${H-6}" text-anchor="middle" font-size="11" fill="var(--mute)" font-family="IBM Plex Mono">${i}</text>`);
+ [[k[0],'var(--amber)'],[k[1],'var(--rose)']].forEach(([c,col])=>s+=`<polyline fill="none" stroke="${col}" stroke-width="2.2" stroke-linejoin="round" points="${D.map((d,i)=>X(i)+','+Y(d[c])).join(' ')}"/><circle cx="${X(e)}" cy="${Y(D[e][c])}" r="5" fill="${col}"/>`);
+ s+=`<line x1="${X(e)}" x2="${X(e)}" y1="${pt}" y2="${H-pb}" stroke="var(--mute)" stroke-dasharray="3 4"/>`;$('ch').innerHTML=s;const d=D[e],n=m?'loss':'acc',f=(z,a)=>(a?z*100:z).toFixed(a?1:3)+(a?'%':'');
+ $('rd').innerHTML=`<span>Epoch <b>${e+1}</b></span><span>Train ${n} <b>${m?f(d[1]):f(d[0],1)}</b></span><span>Val ${n} <b>${m?f(d[3]):f(d[2],1)}</b></span>`}
+$('ep').oninput=chart;$('mA').onclick=$('mL').onclick=e=>{m=e.target.id=='mL'?1:0;$('mA').setAttribute('aria-pressed',!m);$('mL').setAttribute('aria-pressed',!!m);chart()};
+const bv=D.reduce((b,d,i)=>d[3]<D[b][3]?i:b,0);$('ins').innerHTML=`Validation loss is lowest at epoch <b>${bv+1}</b> (${D[bv][3].toFixed(3)}) and rises to ${D[99][3].toFixed(3)} by epoch 100 while training loss keeps falling. Early stopping would likely help.`;
+$('bars').innerHTML=C.map((c,i)=>[c,N[i]]).sort((a,b)=>b[1]-a[1]).map(o=>`<div class="cb"><span>${cap(o[0])}</span><i style="width:${o[1]/204*100}%"></i><span class="num">${o[1]}</span></div>`).join('');
+// nav
+const T={classify:'Classify',batch:'Batch',model:'Model'};
+function go(id){if(!T[id])id='classify';document.querySelectorAll('.view').forEach(e=>e.classList.toggle('on',e.id==id));document.querySelectorAll('.nav').forEach(b=>b.dataset.v==id?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));$('ttl').textContent=T[id];try{history.replaceState(null,'','#'+id)}catch(e){}if(id=='classify')wave();if(id=='model')chart()}
+document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>go(b.dataset.v));
+build();infer();rh();addEventListener('resize',()=>draw(1));go(location.hash.slice(1));if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>draw(1)).catch(()=>{});
+</script></body></html>
